@@ -1,0 +1,31 @@
+name: Check GET request
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+
+jobs:
+  check_request:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check GET request
+      id: check
+      run: |
+        for i in {1..100}; do
+          if curl -f https://appulate.com/build/scripts/pages/insured/insured-grid/index.entry.js?v=5PMfDUNkrQI9hycn6IpwrJmrsd1iIMG29vYtjZwVEeY; then
+            echo "Request succeeded on attempt $i"
+            break
+          else
+            echo "Request failed on attempt $i"
+          fi
+        done
+
+    - name: Check status
+      run: |
+        if [[ "${{ steps.check.exitcode }}" -ne 0 ]]; then
+          echo "Request failed"
+          exit 1
+        else
+          echo "Request succeeded"
+        fi
