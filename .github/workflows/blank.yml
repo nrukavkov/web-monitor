@@ -3,24 +3,22 @@ name: Check GET request
 on:
   schedule:
     - cron: "*/5 * * * *"
-  workflow_dispatch:
 
 jobs:
   check_request:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Check GET request
-      uses: actions/setup-node@v2
-      with:
-        node-version: '14.x'
-      # Use puppeteer action to make GET request with Chrome
-      uses: wow-actions/puppeteer@v1.2
-      with:
-        headless: true
-        puppeteer-version: '10.x'
-        args: |
-          - |
+      - name: Check GET request
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14.x'
+      - name: Make request
+        uses: wow-actions/puppeteer@v1.2
+        with:
+          headless: true
+          puppeteer-version: '10.x'
+          args: |
             for (let i = 1; i <= 100; i++) {
               const page = await browser.newPage();
               try {
@@ -34,12 +32,10 @@ jobs:
               await page.close();
             }
           waitUntil: networkidle2
-
-    - name: Check status
-      run: |
-        if [[ "${{ job.status }}" == "failure" ]]; then
-          echo "Request failed"
-          exit 1
-        else
-          echo "Request succeeded"
-        fi
+      - name: Check status
+        run: |
+          if [[ "${{ job.status }}" == "failure" ]]; then
+            echo "Request failed"
+            exit 1
+          else
+            echo "Request succeeded"
