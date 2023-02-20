@@ -11,15 +11,33 @@ jobs:
     steps:
     - name: Check GET request
       id: check
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14.x'
       run: |
-        for i in {1..100}; do
-          if curl -f https://appulate.com/build/scripts/pages/insured/insured-grid/index.entry.js?v=5PMfDUNkrQI9hycn6IpwrJmrsd1iIMG29vYtjZwVEeY; then
-            echo "Request succeeded on attempt $i"
-            break
-          else
-            echo "Request failed on attempt $i"
-          fi
-        done
+        npm install puppeteer
+        node -e "
+        const puppeteer = require('puppeteer');
+        (async () => {
+          const browser = await puppeteer.launch();
+          const page = await browser.newPage();
+          let success = false;
+          for (let i = 1; i <= 100; i++) {
+            try {
+              await page.goto('https://appulate.com/build/scripts/pages/insured/insured-grid/index.entry.js?v=5PMfDUNkrQI9hycn6IpwrJmrsd1iIMG29vYtjZwVEeY', {waitUntil: 'networkidle2'});
+              console.log('Request succeeded on attempt ' + i);
+              success = true;
+              break;
+            } catch (err) {
+              console.log('Request failed on attempt ' + i);
+            }
+          }
+          await browser.close();
+          if (!success) {
+            process.exit(1);
+          }
+        })();
+        "
 
     - name: Check status
       run: |
