@@ -27,6 +27,6 @@ jobs:
           days_left=$(( ($(date -d $expiration_date +%s) - $(date -d $today_date +%s)) / (60*60*24) ))
           echo "Domain: $domain. Expiration date: $expiration_date. Days left: $days_left"
           if [[ $days_left -lt 14 ]]; then
-            curl -X POST -H 'Content-type: application/json' --data '{"text":"Domain *'"$domain"'* is expiring in *'"$days_left"'* days."}' $SLACK_WEBHOOK_URL
+            curl -X POST -H 'Content-type: application/json' --data '{"text":"Domain *'"$domain"'* is expiring in *'"$days_left"'* days."}' ${{ secrets.SLACK_WEBHOOK_URL }}
           fi
         done
